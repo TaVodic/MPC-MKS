@@ -95,17 +95,26 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		const uint8_t array[32] = { 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0,
-				1, 1, 1, 0, 0, 1, 0, 1, 0, 1 };
+		//const uint8_t array[32] = { 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1 };
+		const uint32_t sos_bin = 0b1010100111011101110010101;
 
-		for (uint8_t i = 0; i < sizeof(array); i++) {
-			if (array[i]) {
+		for (uint8_t i = 0; i < 27; i++) {
+			if ((sos_bin >> i) & 0b1) {
 				LL_GPIO_SetOutputPin(LD2_GPIO_Port, LD2_Pin);
 			} else {
 				LL_GPIO_ResetOutputPin(LD2_GPIO_Port, LD2_Pin);
 			}
 			LL_mDelay(200);
 		}
+
+		/*for (uint8_t i = 0; i < sizeof(array); i++) {
+			if (array[i]) {
+				LL_GPIO_SetOutputPin(LD2_GPIO_Port, LD2_Pin);
+			} else {
+				LL_GPIO_ResetOutputPin(LD2_GPIO_Port, LD2_Pin);
+			}
+			LL_mDelay(200);
+		}*/
 
 		/*LL_GPIO_SetOutputPin(LD2_GPIO_Port, LD2_Pin);
 		 LL_mDelay(200);
