@@ -99,7 +99,7 @@ int main(void) {
 		const uint32_t sos_bin = 0b1010100111011101110010101;
 
 		for (uint8_t i = 0; i < 27; i++) {
-			if ((sos_bin >> i) & 0b1) {
+			if ((sos_bin >> i) & 1U) {
 				LL_GPIO_SetOutputPin(LD2_GPIO_Port, LD2_Pin);
 			} else {
 				LL_GPIO_ResetOutputPin(LD2_GPIO_Port, LD2_Pin);
