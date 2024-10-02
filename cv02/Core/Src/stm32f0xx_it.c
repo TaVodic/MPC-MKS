@@ -126,6 +126,8 @@ void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
+	Tick++;
+
   /* USER CODE END SysTick_IRQn 0 */
 
   /* USER CODE BEGIN SysTick_IRQn 1 */
@@ -153,7 +155,7 @@ void EXTI0_1_IRQHandler(void)
     LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_0);
     /* USER CODE BEGIN LL_EXTI_LINE_0 */
 
-    LL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+    LL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
 
     /* USER CODE END LL_EXTI_LINE_0 */
   }
