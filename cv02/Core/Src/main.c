@@ -96,10 +96,10 @@ void button(void) {
 		delay_but = Tick;
 	}
 
-	static uint16_t debounce = 0;
+	static uint16_t debounce = 0xFFFF;
 	if (Tick > delay_but_2 + PIN_SAMPLE_TIME_2) {
 		debounce = debounce << 1;
-		debounce = debounce & LL_GPIO_IsInputPinSet(S1_GPIO_Port, S1_Pin);
+		debounce = debounce  (0xFFFE | LL_GPIO_IsInputPinSet(S1_GPIO_Port, S1_Pin));
 
 		if (debounce == 0x7FFF) {
 			off_time = Tick + LED_TIME_LONG;
