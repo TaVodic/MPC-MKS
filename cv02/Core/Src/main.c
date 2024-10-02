@@ -32,7 +32,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define LED_TIME_BLINK 300
-#define LED_TIME_SHORT 1000
+#define LED_TIME_SHORT 500
+#define LED_TIME_LONG 1000
 #define PIN_SAMPLE_TIME 100
 /* USER CODE END PD */
 
@@ -80,7 +81,16 @@ void button(void) {
 			off_time = Tick + LED_TIME_SHORT;
 			LL_GPIO_SetOutputPin(LED1_GPIO_Port, LED1_Pin);
 		}
+
+		static uint32_t old_s1;
+		uint32_t new_s1 = LL_GPIO_IsInputPinSet(S1_GPIO_Port, S1_Pin);
+		if (old_s1 && !new_s1) { // falling edge
+			off_time = Tick + LED_TIME_LONG;
+			LL_GPIO_SetOutputPin(LED1_GPIO_Port, LED1_Pin);
+		}
+
 		old_s2 = new_s2;
+		old_s1 = new_s1;
 		delay_but = Tick;
 	}
 
