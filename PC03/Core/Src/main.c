@@ -90,15 +90,20 @@ int main(void) {
 	MX_GPIO_Init();
 	MX_USART2_UART_Init();
 	/* USER CODE BEGIN 2 */
-
+	sct_init();
+	sct_value(123);
+	HAL_Delay(1000);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		sct_init();
-		HAL_Delay(1000);
-		sct_led(0x7A5C36DE);
+		static uint16_t counter;
+		sct_value(counter);
+		counter += 111;
+		if (counter > 999) {
+			counter = 0;
+		}
 		HAL_Delay(1000);
 		/* USER CODE END WHILE */
 
