@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <sct.h>
+#include "sct.h"
 
 /* USER CODE END Includes */
 
@@ -97,6 +97,7 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 		sct_init();
+		HAL_Delay(1000);
 		sct_led(0x7A5C36DE);
 		HAL_Delay(1000);
 		/* USER CODE END WHILE */
