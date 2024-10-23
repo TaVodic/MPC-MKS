@@ -86,7 +86,7 @@ static void uart_process_command(char *cmd) {
 		if (strcasecmp(token, "ON") == 0) {
 			HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 1);
 		} else if (strcasecmp(token, "OFF") == 0) {
-			HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
+			HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 0);
 		}
 		printf("OK\n");
 	} else if (strcasecmp(token, "LED2") == 0) {
@@ -94,7 +94,7 @@ static void uart_process_command(char *cmd) {
 		if (strcasecmp(token, "ON") == 0) {
 			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 1);
 		} else if (strcasecmp(token, "OFF") == 0) {
-			HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
+			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);
 		}
 		printf("OK\n");
 	} else if (strcasecmp(token, "STATUS") == 0) {
@@ -114,9 +114,10 @@ static void uart_process_command(char *cmd) {
 		uint16_t memAddr = atoi(token);
 		token = strtok(NULL, " ");
 		uint8_t value = atoi(token);
-		HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, memAddr, I2C_MEMADD_SIZE_16BIT,
-				&value, 1, 1000);
+		HAL_I2C_Mem_Write(&hi2c1, EEPROM_ADDR, memAddr, I2C_MEMADD_SIZE_16BIT, &value, 1, 1000);
 		printf("Written %02x: %02x\n", memAddr, value);
+		/* Check if the EEPROM is ready for a new operation */
+		while (HAL_I2C_IsDeviceReady(&hi2c1, EEPROM_ADDR, 300, 1000) == HAL_TIMEOUT) {}
 		printf("OK\n");
 	} else if (strcasecmp(token, "DUMP") == 0) {
 		uint8_t value;
