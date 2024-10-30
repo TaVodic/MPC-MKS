@@ -62,7 +62,8 @@ static void MX_ADC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int _write(int file, char const *buf, int n) {
+int _write(int file, char const *buf, int n)
+{
 	/* stdout redirection to UART2 */
 	HAL_UART_Transmit(&huart2, (uint8_t*) (buf), n, HAL_MAX_DELAY);
 	return n;
@@ -74,7 +75,8 @@ int _write(int file, char const *buf, int n) {
  * @brief  The application entry point.
  * @retval int
  */
-int main(void) {
+int main(void)
+{
 
 	/* USER CODE BEGIN 1 */
 
@@ -111,24 +113,57 @@ int main(void) {
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
-	while (1) {
-		int16_t temp;
-		/*OWConvertAll();
-		 HAL_Delay(750);
-		 if (OWReadTemperature(&temp) == 0) {
-		 printf("ERROR reading sensor\r\n");
-		 }
-		 temp = temp / 10;
-		 printf("Temp: %d°C\r\n", temp);
-		 sct_value(temp, 0, 1);*/
+	while (1)
+	{
+		int16_t temp_DS = 0;
+		int16_t temp_ntc = 0;
+		static enum FSM
+		{
+			DALLAS, NTC
+		} state;
 
-		int16_t adc;
-		adc = HAL_ADC_GetValue(&hadc);
-		temp = ntc_lookup_table[adc];
-		temp = temp / 10;
-		printf("Temp: %d°C\r\n", temp);
-		sct_value(temp, 0, 1);
-		HAL_Delay(500);
+		static uint32_t cTick_DS;
+		if (HAL_GetTick() > cTick_DS + 750)
+		{
+			OWConvertAll();
+			if (OWReadTemperature(&temp_DS) == 0)
+			{
+				printf("ERROR reading sensor\r\n");
+			}
+			temp_DS = temp_DS / 10;
+			sct_value(temp_DS, 0, 1);
+			cTick_DS = HAL_GetTick();
+		}
+
+		static uint32_t cTick_ntc;
+		if (HAL_GetTick() > cTick_ntc + 500)
+		{
+			int16_t adc;
+			adc = HAL_ADC_GetValue(&hadc);
+			temp_ntc = ntc_lookup_table[adc];
+			cTick_ntc = HAL_GetTick();
+		}
+
+		if (HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin) == 0)
+		{
+			state = DALLAS;
+		}
+		if (HAL_GPIO_ReadPin(S1_GPIO_Port, S1_Pin) == 0)
+		{
+			state = NTC;
+		}
+
+		switch (state)
+		{
+		case DALLAS:
+			sct_value(temp_DS, 0, 1);
+			printf("Temp DS: %d.%d°C\r\n", temp_DS/10, temp_DS%10);
+			break;
+		case NTC:
+			sct_value(temp_ntc, 0, 1);
+			printf("Temp NTC: %d.%d°C\r\n", temp_ntc/10, temp_ntc%10);
+			break;
+		}
 
 		/* USER CODE END WHILE */
 
@@ -141,9 +176,12 @@ int main(void) {
  * @brief System Clock Configuration
  * @retval None
  */
-void SystemClock_Config(void) {
-	RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
-	RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
+void SystemClock_Config(void)
+{
+	RCC_OscInitTypeDef RCC_OscInitStruct =
+	{ 0 };
+	RCC_ClkInitTypeDef RCC_ClkInitStruct =
+	{ 0 };
 
 	/** Initializes the RCC Oscillators according to the specified parameters
 	 * in the RCC_OscInitTypeDef structure.
@@ -158,7 +196,8 @@ void SystemClock_Config(void) {
 	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
 	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL12;
 	RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
-	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+	{
 		Error_Handler();
 	}
 
@@ -170,7 +209,8 @@ void SystemClock_Config(void) {
 	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
 
-	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK) {
+	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+	{
 		Error_Handler();
 	}
 }
@@ -180,13 +220,15 @@ void SystemClock_Config(void) {
  * @param None
  * @retval None
  */
-static void MX_ADC_Init(void) {
+static void MX_ADC_Init(void)
+{
 
 	/* USER CODE BEGIN ADC_Init 0 */
 
 	/* USER CODE END ADC_Init 0 */
 
-	ADC_ChannelConfTypeDef sConfig = { 0 };
+	ADC_ChannelConfTypeDef sConfig =
+	{ 0 };
 
 	/* USER CODE BEGIN ADC_Init 1 */
 
@@ -208,7 +250,8 @@ static void MX_ADC_Init(void) {
 	hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
 	hadc.Init.DMAContinuousRequests = DISABLE;
 	hadc.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
-	if (HAL_ADC_Init(&hadc) != HAL_OK) {
+	if (HAL_ADC_Init(&hadc) != HAL_OK)
+	{
 		Error_Handler();
 	}
 
@@ -217,7 +260,8 @@ static void MX_ADC_Init(void) {
 	sConfig.Channel = ADC_CHANNEL_1;
 	sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
 	sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
-	if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK) {
+	if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
+	{
 		Error_Handler();
 	}
 	/* USER CODE BEGIN ADC_Init 2 */
@@ -231,7 +275,8 @@ static void MX_ADC_Init(void) {
  * @param None
  * @retval None
  */
-static void MX_USART2_UART_Init(void) {
+static void MX_USART2_UART_Init(void)
+{
 
 	/* USER CODE BEGIN USART2_Init 0 */
 
@@ -250,7 +295,8 @@ static void MX_USART2_UART_Init(void) {
 	huart2.Init.OverSampling = UART_OVERSAMPLING_16;
 	huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
 	huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-	if (HAL_UART_Init(&huart2) != HAL_OK) {
+	if (HAL_UART_Init(&huart2) != HAL_OK)
+	{
 		Error_Handler();
 	}
 	/* USER CODE BEGIN USART2_Init 2 */
@@ -264,8 +310,10 @@ static void MX_USART2_UART_Init(void) {
  * @param None
  * @retval None
  */
-static void MX_GPIO_Init(void) {
-	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+static void MX_GPIO_Init(void)
+{
+	GPIO_InitTypeDef GPIO_InitStruct =
+	{ 0 };
 	/* USER CODE BEGIN MX_GPIO_Init_1 */
 	/* USER CODE END MX_GPIO_Init_1 */
 
@@ -333,11 +381,13 @@ static void MX_GPIO_Init(void) {
  * @brief  This function is executed in case of error occurrence.
  * @retval None
  */
-void Error_Handler(void) {
+void Error_Handler(void)
+{
 	/* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
 	__disable_irq();
-	while (1) {
+	while (1)
+	{
 	}
 	/* USER CODE END Error_Handler_Debug */
 }
