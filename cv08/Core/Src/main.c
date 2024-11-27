@@ -105,6 +105,14 @@ int main(void)
 
 	HAL_TIM_Base_Start_IT(&htim3);
 
+	static char lock[] =
+	{ '7', '9', '3', '2', '#' };
+
+	static char *lock_p = 0;
+	lock_p = &lock[0];
+
+	static uint32_t cTime;
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -117,10 +125,34 @@ int main(void)
 
 		if (key != 0)
 		{
+			HAL_Delay(400);
 			printf("pressed '%c'\n", key);
-			HAL_Delay(500);
+			printf("pass '%c'\n", *lock_p);
+
+			if (key == *lock_p)
+			{
+				printf("Correct symbol\n");
+				if (lock_p == &lock[4])
+				{
+					HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+					printf("Correct password\n");
+					lock_p = &lock[0];
+				}
+				lock_p++;
+			}
+			else
+			{
+				printf("Wrong symbol\n");
+			}
 			key = 0;
+			cTime = HAL_GetTick();
 		}
+
+		if ((HAL_GetTick() > cTime + 4000) && lock_p != &lock[0]){
+			printf("Timeout!\n");
+			lock_p = &lock[0];
+		}
+
 
 		/* USER CODE END WHILE */
 
@@ -385,6 +417,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+
 	static uint8_t row = 0;
 	static const char keyboard[4][4] =
 	{
