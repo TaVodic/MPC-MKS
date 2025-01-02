@@ -4,8 +4,8 @@
  *  Created on: Jan 2, 2025
  *      Author: Martin
  */
+#include <cv.h>
 #include "main.h"
-#include "cv01.h"
 
 void cv01()
 {
