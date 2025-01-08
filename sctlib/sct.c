@@ -55,13 +55,13 @@ static const uint32_t reg_values[4][11] = {
 	//----43215678---- @ LED
 	0b0000000000000000 << 16,
 	0b0000000100000000 << 16,
-	0b0000001100000000 << 16,
-	0b0000011100000000 << 16,
-	0b0000111100000000 << 16,
-	0b0000111110000000 << 16,
-	0b0000111111000000 << 16,
-	0b0000111111100000 << 16,
-	0b0000111111110000 << 16,
+	0b0000001000000000 << 16,
+	0b0000010000000000 << 16,
+	0b0000100000000000 << 16,
+	0b0000000010000000 << 16,
+	0b0000000001000000 << 16,
+	0b0000000000100000 << 16,
+	0b0000000000010000 << 16,
 	0b0000000000000000 << 16,
 	0b0000000000000000 << 16,
 	},
@@ -86,12 +86,21 @@ void sct_init(void) {
 	sct_led(0);
 }
 
-void sct_value(uint16_t value, uint16_t led, uint8_t point) {
-	uint32_t reg = 1;
+void sct_value(uint16_t value, uint8_t* leds, uint8_t point) {
+	uint32_t reg = 0;
 	reg |= reg_values[0][value / 100 % 10];
 	reg |= reg_values[1][value / 10 % 10];
 	reg |= reg_values[2][value / 1 % 10];
-	reg |= reg_values[3][led];
+
 	if(point != 0) reg |= reg_values[point-1][10]; // decimal point
+
+	for (uint8_t i = 0; i < 8; ++i) {
+		if (leds[i] == 1){
+			reg |= reg_values[3][i+1];
+		} else{
+			reg |= reg_values[3][0];
+		}
+	}
+
 	sct_led(reg);
 }

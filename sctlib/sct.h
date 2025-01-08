@@ -10,6 +10,7 @@
 
 void sct_init(void);
 void sct_led(uint32_t value);
-void sct_value(uint16_t value, uint16_t led, uint8_t point);
+void sct_value(uint16_t value, uint8_t* leds, uint8_t point);
+void cst_led(uint8_t* leds);
 
 #endif /* SRC_SCT_H_ */
