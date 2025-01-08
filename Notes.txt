@@ -1,0 +1,54 @@
+HAL_GetTick - systic
+HAL_delay() - blocking delay
+
+CV02	Debouncing	jednoduchy len so samplovanim, da sa pouzit aj na ISR
+CV03	Encoder		TIM1 -> combined channels, counter period, channel 1 polarity falling, chann2 rising. [str. 13]
+CV04	Trimmer		ADC IN0 -> continous conversion, data overwritten, Sampling time 239.5 cycles [str. 15]
+CV04	LEDs and diplay PB3 = SCT_CLK, PB4 = SCT_SDI, PB5 = SCT_NLA, PB10 = SCT_NOE
+CV05	UART DMA 	[str. 19], command proccesing CV05 code 
+			(DMA), main -> uart_byte_available(uint8_t c) -> uart_process_command(char *cmd)
+CV05	I2C		PB9 (SDA) and PB8 (SCL) - remap defalut I2C pins!!! [str.21]	 	
+CV06 	1Wire		DQ @ PA10, output mode open-drain, output level high [str. 23]
+CV06	NTC		NTCC-10K type NTC temperature sensor, Inc/ntc_lookup.h		
+CV07	ACCL		lis2dw12.c .h [str. 27]	
+
+BTNS	(PC0 = S2, PC1 = S1)
+LEDS	(PA4 = LED1, PB0 = LED2)
+
+//////// GPIO ////////
+GPIOC->BSRR |= (1 << 13);
+GPIOC->BSR |= (1 << 13);
+HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+
+//////// EXTI ////////
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	static volatile uint32_t cTime;
+
+	if (HAL_GetTick() > cTime + 300){
+		HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+		cTime = HAL_GetTick();
+	}
+
+}
+
+/////// UART debugging ///////
+For printf() to work, we need to #include <stdio.h> and create a system function _write(): baud 38400
+int _write(int file, char const *buf, int n)
+{
+ /* stdout redirection to UART2 */
+ HAL_UART_Transmit(&huart2, (uint8_t*)(buf), n, HAL_MAX_DELAY);
+ return n;
+}
+
+//////// LP filter /////// [str. 16]
+raw_pot - output value 
+static uint32_t avg_pot; temp
+raw_pot = avg_pot >> ADC_Q; 12
+avg_pot -= raw_pot;
+avg_pot += HAL_ADC_GetValue(hadc);
+
+//////// UART ////////////
+uint8_t c;
+HAL_UART_Receive(&huart2, &c, 1, HAL_MAX_DELAY);
+HAL_UART_Transmit(&huart2, &c, 1, HAL_MAX_DELAY);
