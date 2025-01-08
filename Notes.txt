@@ -42,7 +42,7 @@ int _write(int file, char const *buf, int n)
 }
 
 //////// LP filter /////// [str. 16]
-raw_pot - output value 
+raw_pot = output value 
 static uint32_t avg_pot; temp
 raw_pot = avg_pot >> ADC_Q; 12
 avg_pot -= raw_pot;
