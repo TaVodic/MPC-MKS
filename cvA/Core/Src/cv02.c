@@ -37,7 +37,7 @@ void cv02_button()
 		cTime = HAL_GetTick();
 	}
 
-	if (HAL_GetTick() > cTime2 + 1000)
+	if (HAL_GetTick() > cTime2 + 100)
 	{
 		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, !GPIO_PIN_RESET);
 		cTime2 = 0xFFFFFFFF;

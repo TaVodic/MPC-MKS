@@ -58,7 +58,13 @@ static void MX_GPIO_Init(void);
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	//HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+	static volatile uint32_t cTime;
+
+	if (HAL_GetTick() > cTime + 300){
+		HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+		cTime = HAL_GetTick();
+	}
+
 }
 
 /* USER CODE END 0 */
@@ -102,7 +108,7 @@ int main(void)
 	{
 		//cv01();
 		//cv02_led();
-		cv02_button();
+		//cv02_button();
 
 		/* USER CODE END WHILE */
 
