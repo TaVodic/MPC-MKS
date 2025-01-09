@@ -59,16 +59,15 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t generate_random(uint32_t seed)
+uint8_t generate_random(uint32_t seed, uint8_t max)
 {
 
-	// preskladat bity
 	seed ^= seed >> 21;
 	seed ^= seed << 15;
 	seed ^= seed >> 4;
-	seed *= 2685821657736338717UL;  // vynasobit pseudo nahodnou konstantou
+	seed *= 2685821657736338717UL;
 
-	return ((seed % 6) + 1);
+	return ((seed % max) + 1);
 }
 
 
@@ -135,11 +134,11 @@ int main(void)
 	  static uint32_t cTime_effect;
 	  if (HAL_GetTick() > cTime_effect + effect_delay && effect_en)
 	  {
-		  sct_cube(generate_random(HAL_GetTick()));
+		  sct_cube(generate_random(HAL_GetTick(), 6));
 
 		  //HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
 
-		  effect_delay += 10;
+		  effect_delay += 10 + generate_random(HAL_GetTick(), 5);
 
 		  if(effect_delay > MAX_DELAY)
 		  {
@@ -148,7 +147,6 @@ int main(void)
 		  }
 
 		  cTime_effect = HAL_GetTick();
-
 	  }
 
 	  static uint32_t cTime_debS2;
@@ -156,7 +154,7 @@ int main(void)
 	  {
 		  if(HAL_GPIO_ReadPin(S2_GPIO_Port, S2_Pin) == 0)
 		  {
-			  sct_cube(generate_random(HAL_GetTick()));
+			  sct_cube(generate_random(HAL_GetTick(), 6));
 			  effect_en = 0;
 			  HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 		  }

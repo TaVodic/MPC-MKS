@@ -1,4 +1,4 @@
-../Core/Src/sct.c:87:6:sct_led	2
-../Core/Src/sct.c:102:6:sct_init	1
-../Core/Src/sct.c:106:6:sct_value	4
-../Core/Src/sct.c:125:6:sct_cube	1
+../Core/Src/sct.c:85:6:sct_led	2
+../Core/Src/sct.c:100:6:sct_init	1
+../Core/Src/sct.c:104:6:sct_value	4
+../Core/Src/sct.c:123:6:sct_cube	1
